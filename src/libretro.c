@@ -32,7 +32,13 @@ static retro_audio_sample_batch_t audio_batch_cb;
 
 static CHIP8 chip8;
 static unsigned long cpu_debt = 0;
+
+#if !defined(SF2000)
 #define AUDIO_RESAMPLE_RATE 44100
+#else
+#define AUDIO_RESAMPLE_RATE 11025
+#endif
+
 static unsigned int audio_counter_chip8 = 0;
 static unsigned int audio_counter_resample = 0;
 static unsigned int audio_freq_chip8 = 0;
@@ -48,16 +54,16 @@ bool chip8_handle_user_flags(CHIP8 *chip8p, int num_flags, bool save)
 {
     if (num_flags <= NUM_USER_FLAGS)
     {
-	if (save)
-	{
-	    memcpy(sram, chip8p->V, num_flags);
-	}
-	else
-	{
-	    memcpy(chip8p->V, sram, num_flags);
-	}
+    if (save)
+    {
+        memcpy(sram, chip8p->V, num_flags);
+    }
+    else
+    {
+        memcpy(chip8p->V, sram, num_flags);
+    }
 
-	return true;
+    return true;
     }
     else
     {
@@ -89,7 +95,7 @@ static pixel_t p2_color = P2_COLOR_DEFAULT;
 static pixel_t overlap_color = OVERLAP_COLOR_DEFAULT;
 
 static void fallback_log(enum retro_log_level level,
-			 const char *fmt, ...) {
+             const char *fmt, ...) {
     va_list args;
 
     (void) level;
@@ -101,54 +107,57 @@ static void fallback_log(enum retro_log_level level,
    
 #define FIRST_QUIRK_VARIABLE 0
 
+#if defined(SF2000)
 #define CHIP8KEYS "0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F"
+#endif
 
 static struct retro_variable variables[] =
 {
     {
-	"jaxe_quirk_0_ram_init",
-	"Ram init quirk; enabled|disabled",
+    "jaxe_quirk_0_ram_init",
+    "Ram init quirk; enabled|disabled",
     },
     {
-	"jaxe_quirk_1_8xy6_8xye",
-	"8xy6/8xyE quirk; enabled|disabled",
+    "jaxe_quirk_1_8xy6_8xye",
+    "8xy6/8xyE quirk; enabled|disabled",
     },
     {
-	"jaxe_quirk_2_fx55_fx65",
-	"Fx55/Fx65 quirk; enabled|disabled",
+    "jaxe_quirk_2_fx55_fx65",
+    "Fx55/Fx65 quirk; enabled|disabled",
     },
     {
-	"jaxe_quirk_3_bnnn",
-	"Bnnn quirk; enabled|disabled",
+    "jaxe_quirk_3_bnnn",
+    "Bnnn quirk; enabled|disabled",
     },
     {
-	"jaxe_quirk_4_big_sprite_lores",
-	"Big Sprite LORES quirk; enabled|disabled",
+    "jaxe_quirk_4_big_sprite_lores",
+    "Big Sprite LORES quirk; enabled|disabled",
     },
     {
-	"jaxe_quirk_5_00fe_00ff",
-	"00FE/00FF quirk; enabled|disabled",
+    "jaxe_quirk_5_00fe_00ff",
+    "00FE/00FF quirk; enabled|disabled",
     },
     {
-	"jaxe_quirk_6_sprite_wrapping",
-	"Sprite Wrapping; enabled|disabled",
+    "jaxe_quirk_6_sprite_wrapping",
+    "Sprite Wrapping; enabled|disabled",
     },
     {
-	"jaxe_quirk_7_collision_enumeration",
-	"Collision Enumeration; enabled|disabled",
+    "jaxe_quirk_7_collision_enumeration",
+    "Collision Enumeration; enabled|disabled",
     },
     {
-	"jaxe_quirk_8_collision_bottom_of_screen",
-	"Collision with Bottom of Screen; enabled|disabled",
+    "jaxe_quirk_8_collision_bottom_of_screen",
+    "Collision with Bottom of Screen; enabled|disabled",
     },
     {
-	"jaxe_cpu_requency",
-	"CPU frequency; 1000|1500|2000|3000|5000|10000|800|750|600|500|400|300",
+    "jaxe_cpu_requency",
+    "CPU frequency; 1000|1500|2000|3000|5000|10000|800|750|600|500|400|300",
     },
     {
-	"jaxe_theme",
-	"Theme; Default|Black and white|Inverted black and white|Blood|Hacker|Space|Crazy Orange|Cyberpunk"
+    "jaxe_theme",
+    "Theme; Default|Black and white|Inverted black and white|Blood|Hacker|Space|Crazy Orange|Cyberpunk"
     },
+    #if defined(SF2000)
     { "jaxe_joypad_left",    "Joypad Left mapping; " CHIP8KEYS },
     { "jaxe_joypad_right",   "Joypad Right mapping; " CHIP8KEYS },
     { "jaxe_joypad_up",      "Joypad Up mapping; " CHIP8KEYS },
@@ -161,6 +170,7 @@ static struct retro_variable variables[] =
     { "jaxe_joypad_r",       "Joypad R button mapping; " CHIP8KEYS },
     { "jaxe_joypad_l2",      "Joypad L2 button mapping; " CHIP8KEYS },
     { "jaxe_joypad_r2",      "Joypad R2 button mapping; " CHIP8KEYS },
+    #endif
     { NULL, NULL },
 };
 
@@ -208,12 +218,12 @@ static struct retro_input_descriptor input_desc[] = {
 void retro_set_environment(retro_environment_t fn)
 {
     static const struct retro_system_content_info_override content_overrides[] = {
-	{
-	    VALID_EXTENSIONS, /* extensions */
-	    false,     /* need_fullpath */
-	    true       /* persistent_data */
-	},
-	{ NULL, false, false }
+    {
+        VALID_EXTENSIONS, /* extensions */
+        false,     /* need_fullpath */
+        true       /* persistent_data */
+    },
+    { NULL, false, false }
     };
     environ_cb = fn;
 
@@ -222,13 +232,13 @@ void retro_set_environment(retro_environment_t fn)
     struct retro_log_callback log;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
-	log_cb = log.log;
+    log_cb = log.log;
     else
-	log_cb = fallback_log;
+    log_cb = fallback_log;
 
     /* Request a persistent content data buffer */
     environ_cb(RETRO_ENVIRONMENT_SET_CONTENT_INFO_OVERRIDE,
-	       (void*)content_overrides);
+           (void*)content_overrides);
 
     environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_desc);
 }
@@ -241,10 +251,10 @@ static void load_theme(void)
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-	for (int i = 0; i < sizeof (color_themes) / sizeof(color_themes[0]); i++) {
-	    if (strcmp(var.value, color_themes[i].name) == 0)
-		theme_number = i;
-	}
+    for (int i = 0; i < sizeof (color_themes) / sizeof(color_themes[0]); i++) {
+        if (strcmp(var.value, color_themes[i].name) == 0)
+        theme_number = i;
+    }
     }
 
     bg_color = color_themes[theme_number].bg;
@@ -253,6 +263,7 @@ static void load_theme(void)
     overlap_color = color_themes[theme_number].overlap;
 }
 
+#if defined(SF2000)
 static void load_joypad(void)
 {
     struct retro_variable var;
@@ -355,6 +366,7 @@ static void load_joypad(void)
         hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_START;
     }
 }
+#endif
 
 static unsigned long get_cpu_freq_var(unsigned long def)
 {
@@ -362,10 +374,10 @@ static unsigned long get_cpu_freq_var(unsigned long def)
     var.key = "jaxe_cpu_requency";
     var.value = NULL;
     if (!environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) || !var.value)
-	return def;
+    return def;
     unsigned long cpu_freq = strtoul(var.value, 0, 0);
     if (cpu_freq == 0)
-	return def;
+    return def;
     return cpu_freq;
 }
 
@@ -377,22 +389,24 @@ static void chip8_init_with_vars(void)
     unsigned long refresh_freq = REFRESH_FREQ_DEFAULT;
     uint16_t pc_start_addr = PC_START_ADDR_DEFAULT;
 
+    #if defined(SF2000)
     load_joypad();
+    #endif
 
     load_theme();
 
     for (int i = 0; i < NUM_QUIRKS; i++) {
-	struct retro_variable var;
-	var.key = variables[i + FIRST_QUIRK_VARIABLE].key;
-	var.value = NULL;
+    struct retro_variable var;
+    var.key = variables[i + FIRST_QUIRK_VARIABLE].key;
+    var.value = NULL;
 
-	quirks[i] = (!environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) || !var.value) || strcmp(var.value, "disabled") != 0;
+    quirks[i] = (!environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) || !var.value) || strcmp(var.value, "disabled") != 0;
     }
 
     cpu_freq = get_cpu_freq_var(CPU_FREQ_DEFAULT);
 
     chip8_init(&chip8, cpu_freq, timer_freq, refresh_freq, pc_start_addr,
-	       quirks);
+           quirks);
 }
 
 // Makes the physical screen match the emulator display.
@@ -400,29 +414,29 @@ void draw_display(void)
 {
     for (int y = 0; y < DISPLAY_HEIGHT; y++)
     {
-	for (int x = 0; x < DISPLAY_WIDTH; x++)
-	{
-	    pixel_t color;
+    for (int x = 0; x < DISPLAY_WIDTH; x++)
+    {
+        pixel_t color;
 
-	    if (!chip8.display[y][x] && !chip8.display2[y][x])
-	    {
-		color = bg_color;
-	    }
-	    else if (chip8.display[y][x] && !chip8.display2[y][x])
-	    {
-		color = p1_color;
-	    }
-	    else if (!chip8.display[y][x] && chip8.display2[y][x])
-	    {
-		color = p2_color;
-	    }
-	    else
-	    {
-		color = overlap_color;
-	    }
+        if (!chip8.display[y][x] && !chip8.display2[y][x])
+        {
+        color = bg_color;
+        }
+        else if (chip8.display[y][x] && !chip8.display2[y][x])
+        {
+        color = p1_color;
+        }
+        else if (!chip8.display[y][x] && chip8.display2[y][x])
+        {
+        color = p2_color;
+        }
+        else
+        {
+        color = overlap_color;
+        }
 
-	    frame[x + y * DISPLAY_WIDTH] = color;
-	}
+        frame[x + y * DISPLAY_WIDTH] = color;
+    }
     }
 }
 
@@ -463,27 +477,27 @@ bool retro_load_game(const struct retro_game_info *info)
     rom_size = 0;
    
     if (environ_cb(RETRO_ENVIRONMENT_GET_GAME_INFO_EXT, &info_ext) &&
-	info_ext && info_ext->persistent_data) {
-	rom_data = (const uint8_t*)info_ext->data;
-	rom_size = info_ext->size;
+    info_ext && info_ext->persistent_data) {
+    rom_data = (const uint8_t*)info_ext->data;
+    rom_size = info_ext->size;
     }
 
     /* If frontend does not support persistent
      * content data, must create a copy */
     if (!rom_data) {
-	if (!info)
-	    return false;
+    if (!info)
+        return false;
 
-	rom_size = info->size;
-	rom_buf  = malloc(rom_size);
+    rom_size = info->size;
+    rom_buf  = malloc(rom_size);
 
-	if (!rom_buf) {
-	    log_cb(RETRO_LOG_INFO, "Failed to allocate ROM buffer.\n");
-	    return false;
-	}
+    if (!rom_buf) {
+        log_cb(RETRO_LOG_INFO, "Failed to allocate ROM buffer.\n");
+        return false;
+    }
 
-	memcpy(rom_buf, info->data, rom_size);
-	rom_data = (const uint8_t*)rom_buf;
+    memcpy(rom_buf, info->data, rom_size);
+    rom_data = (const uint8_t*)rom_buf;
     }
 
     load_rom();
@@ -494,7 +508,7 @@ bool retro_load_game(const struct retro_game_info *info)
 void retro_unload_game(void)
 {
     if (rom_buf)
-	free(rom_buf);
+    free(rom_buf);
 
     rom_buf = NULL;
     rom_data = NULL;
@@ -518,7 +532,7 @@ int16_t get_audio_sample(void)
     snd_buf_pntr++;
     if (snd_buf_pntr >= (AUDIO_BUF_SIZE * 8))
     {
-	snd_buf_pntr = 0;
+    snd_buf_pntr = 0;
     }
 
     return x;
@@ -529,82 +543,82 @@ static void audio_sample(int16_t sample) {
     // in most cases
     int16_t *bufptr = buf;
     while (audio_counter_resample >= ONE_SEC / AUDIO_RESAMPLE_RATE) {
-	*bufptr++ = sample;
-	*bufptr++ = sample;
-	if (bufptr >= buf + sizeof(buf) / sizeof(buf[0])) {
-	    audio_batch_cb(buf, (bufptr - buf) / 2);
-	    bufptr = buf;
-	}
-	audio_counter_resample -= ONE_SEC / AUDIO_RESAMPLE_RATE;
+    *bufptr++ = sample;
+    *bufptr++ = sample;
+    if (bufptr >= buf + sizeof(buf) / sizeof(buf[0])) {
+        audio_batch_cb(buf, (bufptr - buf) / 2);
+        bufptr = buf;
+    }
+    audio_counter_resample -= ONE_SEC / AUDIO_RESAMPLE_RATE;
     }
 
     if (bufptr != buf) {
-	audio_batch_cb(buf, (bufptr - buf) / 2);
+    audio_batch_cb(buf, (bufptr - buf) / 2);
     }
 }
 
 void retro_run(void)
 {
     if (chip8.exit) {
-	environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);
-	return;
+    environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);
+    return;
     }
 
     bool updated = false;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated) {
-	load_theme();
-	unsigned long cpu_freq = get_cpu_freq_var(chip8.cpu_freq);
-	if (cpu_freq != chip8.cpu_freq)
-	    chip8_set_cpu_freq(&chip8, cpu_freq);
+    load_theme();
+    unsigned long cpu_freq = get_cpu_freq_var(chip8.cpu_freq);
+    if (cpu_freq != chip8.cpu_freq)
+        chip8_set_cpu_freq(&chip8, cpu_freq);
     }
 
     input_poll_cb();
 
     for (int i = 0; i < 16; i++)
-	if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, hexorder[i]))
-	    chip8.keypad[i] = KEY_DOWN;
-	else
-	    chip8.keypad[i] = chip8.keypad[i] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, hexorder[i]))
+        chip8.keypad[i] = KEY_DOWN;
+    else
+        chip8.keypad[i] = chip8.keypad[i] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
 
     uint64_t cycle_step = ONE_SEC / chip8.cpu_freq;
 
     for (unsigned i = 0; i < (chip8.cpu_freq + cpu_debt) / chip8.refresh_freq && !chip8.exit; i++) {
-	chip8.total_cycle_time = cycle_step;
-	chip8_execute(&chip8);
-	if (chip8.timer_freq != chip8.refresh_freq)
-	    chip8_handle_timers(&chip8);
+    chip8.total_cycle_time = cycle_step;
+    chip8_execute(&chip8);
+    if (chip8.timer_freq != chip8.refresh_freq)
+        chip8_handle_timers(&chip8);
 
-	if (!chip8.beep) {
-	    audio_freq_chip8 = 0;
-	    audio_counter_chip8 = 0;
-	    snd_buf_pntr = 0;
-	    audio_counter_resample += cycle_step;
-	    audio_sample(0);
-	} else {
-	    uint64_t cycle_audio_step;
-	    if (!audio_freq_chip8) {
-		audio_freq_chip8 = chip8_get_sound_freq(&chip8);
-		snd_buf_pntr = 0;
-	    }
-	    cycle_audio_step = ONE_SEC / audio_freq_chip8;
-	    audio_counter_chip8 += cycle_step;
-	    while (audio_counter_chip8 > cycle_audio_step) {
-		audio_counter_chip8 -= cycle_audio_step;
-		int16_t sample = get_audio_sample();
-		audio_counter_resample += cycle_audio_step;
-		audio_sample(sample);
-	    }
-	}
+    if (!chip8.beep) {
+        audio_freq_chip8 = 0;
+        audio_counter_chip8 = 0;
+        snd_buf_pntr = 0;
+        audio_counter_resample += cycle_step;
+        audio_sample(0);
+    } else {
+        uint64_t cycle_audio_step;
+        if (!audio_freq_chip8) {
+        audio_freq_chip8 = chip8_get_sound_freq(&chip8);
+        snd_buf_pntr = 0;
+        }
+        cycle_audio_step = ONE_SEC / audio_freq_chip8;
+        audio_counter_chip8 += cycle_step;
+        while (audio_counter_chip8 > cycle_audio_step) {
+        audio_counter_chip8 -= cycle_audio_step;
+        int16_t sample = get_audio_sample();
+        audio_counter_resample += cycle_audio_step;
+        audio_sample(sample);
+        }
+    }
     }
 
     if (chip8.timer_freq == chip8.refresh_freq) {
 
-    	if (chip8.DT > 0){
-    	    chip8.DT--;
+        if (chip8.DT > 0){
+            chip8.DT--;
         }
 
-    	if (chip8.ST > 0){
-    	    chip8.ST--;
+        if (chip8.ST > 0){
+            chip8.ST--;
             chip8.beep =  chip8.ST > 0 ? true : false;
         }
     }
@@ -639,7 +653,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
     int pixelformat = RETRO_PIXEL_FORMAT_RGB565;
 #else
     int pixelformat = RETRO_PIXEL_FORMAT_XRGB8888;
-#endif	
+#endif  
 
     memset(info, 0, sizeof(*info));
     info->geometry.base_width   = DISPLAY_WIDTH;
@@ -681,7 +695,7 @@ size_t retro_serialize_size(void)
 bool retro_serialize(void *data, size_t size)
 {
     if (size < sizeof (struct serialized_state))
-	return false;
+    return false;
 
     struct serialized_state *st = (struct serialized_state *) data;
     memcpy(&st->chip8, &chip8, sizeof(st->chip8));
@@ -697,7 +711,7 @@ bool retro_serialize(void *data, size_t size)
 bool retro_unserialize(const void *data, size_t size)
 {
     if (size < sizeof (struct serialized_state))
-	return false;
+    return false;
 
     const struct serialized_state *st = (struct serialized_state *) data;
     memcpy(&chip8, &st->chip8, sizeof(chip8));
@@ -715,12 +729,12 @@ size_t retro_get_memory_size(unsigned id)
     switch(id)
     {
     case RETRO_MEMORY_SYSTEM_RAM: // System Memory
-	return MAX_RAM;
+    return MAX_RAM;
 
     case RETRO_MEMORY_SAVE_RAM: // SRAM
-	return sizeof(sram);
+    return sizeof(sram);
 
-	// TODO: VRAM
+    // TODO: VRAM
     }
     return 0;
 }
@@ -730,12 +744,12 @@ void *retro_get_memory_data(unsigned id)
     switch(id)
     {
     case RETRO_MEMORY_SYSTEM_RAM: // System Memory
-	return chip8.RAM;
+    return chip8.RAM;
 
     case RETRO_MEMORY_SAVE_RAM: // SRAM
-	return sram;
+    return sram;
 
-	// TODO: VRAM
+    // TODO: VRAM
     }
     return 0;
 }
