@@ -170,6 +170,8 @@ static struct retro_variable variables[] =
     { "jaxe_joypad_r",       "Joypad R button mapping; " CHIP8KEYS },
     { "jaxe_joypad_l2",      "Joypad L2 button mapping; " CHIP8KEYS },
     { "jaxe_joypad_r2",      "Joypad R2 button mapping; " CHIP8KEYS },
+    { "jaxe_joypad_l3",      "Joypad L2 button mapping; " CHIP8KEYS },
+    { "jaxe_joypad_r3",      "Joypad R2 button mapping; " CHIP8KEYS },
     #endif
     { NULL, NULL },
 };
@@ -273,7 +275,7 @@ static void load_joypad(void)
     var.key = "jaxe_joypad_up";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
-        new_position = (int)*var.value - 48;
+        new_position = (int)(toupper( *var.value )) - 48;    
         if (new_position > 9) new_position -= 7;
         hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_UP;
     }
@@ -281,7 +283,7 @@ static void load_joypad(void)
     var.key = "jaxe_joypad_down";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
-        new_position = (int)*var.value - 48;
+        new_position = (int)(toupper( *var.value )) - 48;
         if (new_position > 9) new_position -= 7;
         hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_DOWN;
     }
@@ -289,7 +291,7 @@ static void load_joypad(void)
     var.key = "jaxe_joypad_left";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
-        new_position = (int)*var.value - 48;        
+        new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
         hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_LEFT;
     }
@@ -297,7 +299,7 @@ static void load_joypad(void)
     var.key = "jaxe_joypad_right";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
-        new_position = (int)*var.value - 48;        
+        new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
         hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_RIGHT;
     }
@@ -305,23 +307,23 @@ static void load_joypad(void)
     var.key = "jaxe_joypad_b";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
-        new_position = (int)*var.value - 48;        
-        if (new_position > 9) new_position -= 7;
+        new_position = (int)(toupper( *var.value )) - 48;
+        if (new_position > 9) new_position -= 7;      
         hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_B;
     }
 
     var.key = "jaxe_joypad_a";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
-        new_position = (int)*var.value - 48;        
-        if (new_position > 9) new_position -= 7;
+        new_position = (int)(toupper( *var.value )) - 48;      
+        if (new_position > 9) new_position -= 7;      
         hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_A;
     }
 
     var.key = "jaxe_joypad_y";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
-        new_position = (int)*var.value - 48;        
+        new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
         hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_Y;
     }
@@ -329,7 +331,7 @@ static void load_joypad(void)
     var.key = "jaxe_joypad_x";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
-        new_position = (int)*var.value - 48;        
+        new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
         hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_X;
     }
@@ -337,7 +339,7 @@ static void load_joypad(void)
     var.key = "jaxe_joypad_l";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
-        new_position = (int)*var.value - 48;        
+        new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
         hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_L;
     }
@@ -345,7 +347,39 @@ static void load_joypad(void)
     var.key = "jaxe_joypad_r";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
-        new_position = (int)*var.value - 48;        
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_R;
+    }
+
+    var.key = "jaxe_joypad_l2";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_L;
+    }
+
+    var.key = "jaxe_joypad_r2";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_R;
+    }
+
+    var.key = "jaxe_joypad_l3";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_L;
+    }
+
+    var.key = "jaxe_joypad_r3";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
         hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_R;
     }
@@ -353,7 +387,7 @@ static void load_joypad(void)
     var.key = "jaxe_joypad_select";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
-        new_position = (int)*var.value - 48;        
+        new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
         hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_SELECT;
     }
@@ -361,7 +395,7 @@ static void load_joypad(void)
     var.key = "jaxe_joypad_start";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
-        new_position = (int)*var.value - 48;        
+        new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
         hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_START;
     }
@@ -383,7 +417,7 @@ static unsigned long get_cpu_freq_var(unsigned long def)
 
 static void chip8_init_with_vars(void)
 {
-    bool quirks[NUM_QUIRKS] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+    bool quirks[NUM_QUIRKS] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
     unsigned long cpu_freq = CPU_FREQ_DEFAULT;
     unsigned long timer_freq = TIMER_FREQ_DEFAULT;
     unsigned long refresh_freq = REFRESH_FREQ_DEFAULT;
