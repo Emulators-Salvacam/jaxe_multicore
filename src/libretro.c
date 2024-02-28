@@ -170,8 +170,8 @@ static struct retro_variable variables[] =
     { "jaxe_joypad_r",       "Joypad R button mapping; " CHIP8KEYS },
     { "jaxe_joypad_l2",      "Joypad L2 button mapping; " CHIP8KEYS },
     { "jaxe_joypad_r2",      "Joypad R2 button mapping; " CHIP8KEYS },
-    { "jaxe_joypad_l3",      "Joypad L2 button mapping; " CHIP8KEYS },
-    { "jaxe_joypad_r3",      "Joypad R2 button mapping; " CHIP8KEYS },
+    { "jaxe_joypad_l3",      "Joypad L3 button mapping; " CHIP8KEYS },
+    { "jaxe_joypad_r3",      "Joypad R3 button mapping; " CHIP8KEYS },
     #endif
     { NULL, NULL },
 };
@@ -357,7 +357,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_L;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_L2;
     }
 
     var.key = "jaxe_joypad_r2";
@@ -365,7 +365,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_R;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_R2;
     }
 
     var.key = "jaxe_joypad_l3";
@@ -373,7 +373,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_L;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_L3;
     }
 
     var.key = "jaxe_joypad_r3";
@@ -381,7 +381,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_R;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_R3;
     }
 
     var.key = "jaxe_joypad_select";
