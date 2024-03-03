@@ -32,7 +32,13 @@ static retro_audio_sample_batch_t audio_batch_cb;
 
 static CHIP8 chip8;
 static unsigned long cpu_debt = 0;
+
+#if !defined(SF2000)
 #define AUDIO_RESAMPLE_RATE 44100
+#else
+#define AUDIO_RESAMPLE_RATE 11025
+#endif
+
 static unsigned int audio_counter_chip8 = 0;
 static unsigned int audio_counter_resample = 0;
 static unsigned int audio_freq_chip8 = 0;
@@ -100,6 +106,11 @@ static void fallback_log(enum retro_log_level level,
 }
    
 #define FIRST_QUIRK_VARIABLE 0
+
+#if defined(SF2000)
+#define CHIP8KEYS "0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F"
+#endif
+
 static struct retro_variable variables[] =
 {
     {
@@ -146,6 +157,22 @@ static struct retro_variable variables[] =
 	"jaxe_theme",
 	"Theme; Default|Black and white|Inverted black and white|Blood|Hacker|Space|Crazy Orange|Cyberpunk"
     },
+    #if defined(SF2000)
+    { "jaxe_joypad_left",    "Joypad Left mapping; " CHIP8KEYS },
+    { "jaxe_joypad_right",   "Joypad Right mapping; " CHIP8KEYS },
+    { "jaxe_joypad_up",      "Joypad Up mapping; " CHIP8KEYS },
+    { "jaxe_joypad_down",    "Joypad Down mapping; " CHIP8KEYS },
+    { "jaxe_joypad_a",       "Joypad A button mapping; " CHIP8KEYS },
+    { "jaxe_joypad_b",       "Joypad B button mapping; " CHIP8KEYS },
+    { "jaxe_joypad_x",       "Joypad X button mapping; " CHIP8KEYS },
+    { "jaxe_joypad_y",       "Joypad Y button mapping; " CHIP8KEYS },
+    { "jaxe_joypad_l",       "Joypad L button mapping; " CHIP8KEYS },
+    { "jaxe_joypad_r",       "Joypad R button mapping; " CHIP8KEYS },
+    { "jaxe_joypad_l2",      "Joypad L2 button mapping; " CHIP8KEYS },
+    { "jaxe_joypad_r2",      "Joypad R2 button mapping; " CHIP8KEYS },
+    { "jaxe_joypad_l3",      "Joypad L3 button mapping; " CHIP8KEYS },
+    { "jaxe_joypad_r3",      "Joypad R3 button mapping; " CHIP8KEYS },
+    #endif
     { NULL, NULL },
 };
 
@@ -180,7 +207,7 @@ static struct retro_input_descriptor input_desc[] = {
     { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "5" },
     { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "6" },
     { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "1" },
-    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "5" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "4" },
     { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "A" },
     { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,    "B" },
     { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2,    "D" },
@@ -238,6 +265,143 @@ static void load_theme(void)
     overlap_color = color_themes[theme_number].overlap;
 }
 
+#if defined(SF2000)
+static void load_joypad(void)
+{
+    struct retro_variable var;
+    const char* value;
+    int new_position;
+
+    var.key = "jaxe_joypad_up";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;    
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_UP;
+    }
+
+    var.key = "jaxe_joypad_down";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_DOWN;
+    }
+
+    var.key = "jaxe_joypad_left";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_LEFT;
+    }
+
+    var.key = "jaxe_joypad_right";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_RIGHT;
+    }
+
+    var.key = "jaxe_joypad_b";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;
+        if (new_position > 9) new_position -= 7;      
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_B;
+    }
+
+    var.key = "jaxe_joypad_a";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;      
+        if (new_position > 9) new_position -= 7;      
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_A;
+    }
+
+    var.key = "jaxe_joypad_y";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_Y;
+    }
+
+    var.key = "jaxe_joypad_x";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_X;
+    }
+
+    var.key = "jaxe_joypad_l";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_L;
+    }
+
+    var.key = "jaxe_joypad_r";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_R;
+    }
+
+    var.key = "jaxe_joypad_l2";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_L2;
+    }
+
+    var.key = "jaxe_joypad_r2";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_R2;
+    }
+
+    var.key = "jaxe_joypad_l3";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_L3;
+    }
+
+    var.key = "jaxe_joypad_r3";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_R3;
+    }
+
+    var.key = "jaxe_joypad_select";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_SELECT;
+    }
+
+    var.key = "jaxe_joypad_start";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
+        new_position = (int)(toupper( *var.value )) - 48;        
+        if (new_position > 9) new_position -= 7;
+        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_START;
+    }
+}
+#endif
+
 static unsigned long get_cpu_freq_var(unsigned long def)
 {
     struct retro_variable var;
@@ -253,11 +417,15 @@ static unsigned long get_cpu_freq_var(unsigned long def)
 
 static void chip8_init_with_vars(void)
 {
-    bool quirks[NUM_QUIRKS] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+    bool quirks[NUM_QUIRKS] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
     unsigned long cpu_freq = CPU_FREQ_DEFAULT;
     unsigned long timer_freq = TIMER_FREQ_DEFAULT;
     unsigned long refresh_freq = REFRESH_FREQ_DEFAULT;
     uint16_t pc_start_addr = PC_START_ADDR_DEFAULT;
+
+    #if defined(SF2000)
+    load_joypad();
+    #endif
 
     load_theme();
 
@@ -478,11 +646,15 @@ void retro_run(void)
     }
 
     if (chip8.timer_freq == chip8.refresh_freq) {
-	if (chip8.DT > 0)
-	    chip8.DT--;
 
-	if (chip8.ST > 0)
-	    chip8.ST--;
+    	if (chip8.DT > 0){
+    	    chip8.DT--;
+        }
+
+    	if (chip8.ST > 0){
+    	    chip8.ST--;
+            chip8.beep =  chip8.ST > 0 ? true : false;
+        }
     }
 
     cpu_debt = (chip8.cpu_freq + cpu_debt) % chip8.refresh_freq;
