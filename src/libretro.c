@@ -150,8 +150,12 @@ static struct retro_variable variables[] =
 	"Collision with Bottom of Screen; enabled|disabled",
     },
     {
+    "jaxe_quirk_9_disable_undefined_VF_after_logical_OR_AND_XOR",
+    "Disable undefined VF after logical OR, AND, XOR; enabled|disabled",
+    },
+    {
 	"jaxe_cpu_requency",
-	"CPU frequency; 1000|1500|2000|3000|5000|10000|800|750|600|500|400|300",
+	"CPU frequency; 1000|1500|2000|3000|5000|10000|25000|50000|100000|800|750|600|500|400|300",
     },
     {
 	"jaxe_theme",
