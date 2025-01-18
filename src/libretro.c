@@ -109,6 +109,39 @@ static void fallback_log(enum retro_log_level level,
 
 #if defined(SF2000)
 #define CHIP8KEYS "0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F"
+
+int joypad_left = 7;
+bool joypad_left_press = false;
+int joypad_right = 9;
+bool joypad_right_press = false;
+int joypad_up = 5;
+bool joypad_up_press = false;
+int joypad_down = 8;
+bool joypad_down_press = false;
+int joypad_a = 6;
+bool joypad_a_press = false;
+int joypad_b = 0;
+bool joypad_b_press = false;
+int joypad_x = 12;
+bool joypad_x_press = false;
+int joypad_y = 2;
+bool joypad_y_press = false;
+int joypad_l = 4;
+bool joypad_l_press = false;
+int joypad_r = 10;
+bool joypad_r_press = false;
+int joypad_l2 = 11;
+bool joypad_l2_press = false;
+int joypad_r2 = 13;
+bool joypad_r2_press = false;
+int joypad_l3 = 14;
+bool joypad_l3_press = false;
+int joypad_r3 = 15;
+bool joypad_r3_press = false;
+int joypad_start = 1;
+bool joypad_start_press = false;
+int joypad_select = 3;
+bool joypad_select_press = false;
 #endif
 
 static struct retro_variable variables[] =
@@ -180,6 +213,7 @@ static struct retro_variable variables[] =
     { NULL, NULL },
 };
 
+#if !defined(SF2000)
 // TODO: find a better mapping
 static unsigned hexorder[] = {
     RETRO_DEVICE_ID_JOYPAD_B,
@@ -199,6 +233,7 @@ static unsigned hexorder[] = {
     RETRO_DEVICE_ID_JOYPAD_L3,
     RETRO_DEVICE_ID_JOYPAD_R3
 };
+#endif
 
 static struct retro_input_descriptor input_desc[] = {
     { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "7" },
@@ -281,7 +316,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;    
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_UP;
+        joypad_up = new_position;
     }
 
     var.key = "jaxe_joypad_down";
@@ -289,7 +324,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_DOWN;
+        joypad_down = new_position;
     }
 
     var.key = "jaxe_joypad_left";
@@ -297,7 +332,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_LEFT;
+        joypad_left = new_position;
     }
 
     var.key = "jaxe_joypad_right";
@@ -305,23 +340,23 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_RIGHT;
+        joypad_right = new_position;
     }
 
     var.key = "jaxe_joypad_b";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;
-        if (new_position > 9) new_position -= 7;      
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_B;
+        if (new_position > 9) new_position -= 7;
+        joypad_b = new_position;
     }
 
     var.key = "jaxe_joypad_a";
     var.value = NULL;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;      
-        if (new_position > 9) new_position -= 7;      
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_A;
+        if (new_position > 9) new_position -= 7;
+        joypad_a = new_position;
     }
 
     var.key = "jaxe_joypad_y";
@@ -329,7 +364,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_Y;
+        joypad_y = new_position;
     }
 
     var.key = "jaxe_joypad_x";
@@ -337,7 +372,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_X;
+        joypad_x = new_position;
     }
 
     var.key = "jaxe_joypad_l";
@@ -345,7 +380,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_L;
+        joypad_l = new_position;
     }
 
     var.key = "jaxe_joypad_r";
@@ -353,7 +388,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_R;
+        joypad_r = new_position;
     }
 
     var.key = "jaxe_joypad_l2";
@@ -361,7 +396,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_L2;
+        joypad_l2 = new_position;
     }
 
     var.key = "jaxe_joypad_r2";
@@ -369,7 +404,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_R2;
+        joypad_r2 = new_position;
     }
 
     var.key = "jaxe_joypad_l3";
@@ -377,7 +412,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_L3;
+        joypad_l3 = new_position;
     }
 
     var.key = "jaxe_joypad_r3";
@@ -385,7 +420,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_R3;
+        joypad_r3 = new_position;
     }
 
     var.key = "jaxe_joypad_select";
@@ -393,7 +428,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_SELECT;
+        joypad_select = new_position;
     }
 
     var.key = "jaxe_joypad_start";
@@ -401,7 +436,7 @@ static void load_joypad(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value){
         new_position = (int)(toupper( *var.value )) - 48;        
         if (new_position > 9) new_position -= 7;
-        hexorder[new_position] = RETRO_DEVICE_ID_JOYPAD_START;
+        joypad_start = new_position;
     }
 }
 #endif
@@ -612,11 +647,148 @@ void retro_run(void)
 
     input_poll_cb();
 
-    for (int i = 0; i < 16; i++)
-	if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, hexorder[i]))
-	    chip8.keypad[i] = KEY_DOWN;
-	else
-	    chip8.keypad[i] = chip8.keypad[i] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+    #if !defined(SF2000)
+
+    for (int i = 0; i < 16; i++){
+        if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, hexorder[i])) {
+	        chip8.keypad[i] = KEY_DOWN;
+        }
+	    else {
+	        chip8.keypad[i] = chip8.keypad[i] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        }        
+    }
+
+    #else
+    
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP)) {
+        chip8.keypad[joypad_up] = KEY_DOWN;
+        joypad_up_press = true;
+    } else if (joypad_up_press) {
+        chip8.keypad[joypad_up] = chip8.keypad[joypad_up] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_up_press = false;
+    } 
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN)) {
+        chip8.keypad[joypad_down] = KEY_DOWN;
+        joypad_down_press = true;
+    } else if (joypad_down_press) {
+        chip8.keypad[joypad_down] = chip8.keypad[joypad_down] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_down_press = false;
+    } 
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT)) {
+        chip8.keypad[joypad_left] = KEY_DOWN;
+        joypad_left_press = true;
+    } else if (joypad_left_press) {
+        chip8.keypad[joypad_left] = chip8.keypad[joypad_left] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_left_press = false;
+    } 
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT)) {
+        chip8.keypad[joypad_right] = KEY_DOWN;
+        joypad_right_press = true;
+    } else if (joypad_right_press) {
+        chip8.keypad[joypad_right] = chip8.keypad[joypad_right] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_right_press = false;
+    } 
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A)) {
+        chip8.keypad[joypad_a] = KEY_DOWN;
+        joypad_a_press = true;
+    } else if (joypad_a_press) {
+        chip8.keypad[joypad_a] = chip8.keypad[joypad_a] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_a_press = false;
+    }
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B)) {
+        chip8.keypad[joypad_b] = KEY_DOWN;
+        joypad_b_press = true;
+    } else if (joypad_b_press) {
+        chip8.keypad[joypad_b] = chip8.keypad[joypad_b] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_b_press = false;
+    }
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X)) {
+        chip8.keypad[joypad_x] = KEY_DOWN;
+        joypad_x_press = true;
+    } else if (joypad_x_press) {
+        chip8.keypad[joypad_x] = chip8.keypad[joypad_x] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_x_press = false;
+    }
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y)) {
+        chip8.keypad[joypad_y] = KEY_DOWN;
+        joypad_y_press = true;
+    } else if (joypad_y_press) {
+        chip8.keypad[joypad_y] = chip8.keypad[joypad_y] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_y_press = false;
+    }
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L)) {
+        chip8.keypad[joypad_l] = KEY_DOWN;
+        joypad_l_press = true;
+    } else if (joypad_l_press) {
+        chip8.keypad[joypad_l] = chip8.keypad[joypad_l] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_l_press = false;
+    }
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2)) {
+        chip8.keypad[joypad_l2] = KEY_DOWN;
+        joypad_l2_press = true;
+    } else if (joypad_l2_press) {
+        chip8.keypad[joypad_l2] = chip8.keypad[joypad_l2] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_l2_press = false;
+    }
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3)) {
+        chip8.keypad[joypad_l3] = KEY_DOWN;
+        joypad_l3_press = true;
+    } else if (joypad_l3_press) {
+        chip8.keypad[joypad_l3] = chip8.keypad[joypad_l3] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_l3_press = false;
+    }
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R)) {
+        chip8.keypad[joypad_r] = KEY_DOWN;
+        joypad_r_press = true;
+    } else if (joypad_r_press) {
+        chip8.keypad[joypad_r] = chip8.keypad[joypad_r] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_r_press = false;
+    }
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2)) {
+        chip8.keypad[joypad_r2] = KEY_DOWN;
+        joypad_r2_press = true;
+    } else if (joypad_r2_press) {
+        chip8.keypad[joypad_r2] = chip8.keypad[joypad_r2] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_r2_press = false;
+    }
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3)) {
+        chip8.keypad[joypad_r3] = KEY_DOWN;
+        joypad_r3_press = true;
+    } else if (joypad_r3_press) {
+        chip8.keypad[joypad_r3] = chip8.keypad[joypad_r3] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_r3_press = false;
+    }
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT)) {
+        chip8.keypad[joypad_select] = KEY_DOWN;
+        joypad_select_press = true;
+    } else if (joypad_select_press) {
+        chip8.keypad[joypad_select] = chip8.keypad[joypad_select] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_select_press = false;
+    }
+
+    if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START)) {
+        chip8.keypad[joypad_start] = KEY_DOWN;
+        joypad_start_press = true;
+    } else if (joypad_start_press) {
+        chip8.keypad[joypad_start] = chip8.keypad[joypad_start] == KEY_DOWN ? KEY_RELEASED : KEY_UP;
+        joypad_start_press = false;
+    }
+
+    #endif
 
     uint64_t cycle_step = ONE_SEC / chip8.cpu_freq;
 
