@@ -539,6 +539,27 @@ static void check_joypad_variable(const char joypad_key, int joypad_variable, bo
         *joypad_press = false;
     } 
 }
+static void check_joypad(void)
+{
+
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_UP, joypad_up, &joypad_up_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_DOWN, joypad_down, &joypad_down_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_LEFT, joypad_left, &joypad_left_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_RIGHT, joypad_right, &joypad_right_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_A, joypad_a, &joypad_a_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_B, joypad_b, &joypad_b_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_X, joypad_x, &joypad_x_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_Y, joypad_y, &joypad_y_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_L, joypad_l, &joypad_l_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_R, joypad_r, &joypad_r_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_L2, joypad_l2, &joypad_l2_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_R2, joypad_r2, &joypad_r2_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_L3, joypad_l3, &joypad_l3_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_R3, joypad_r3, &joypad_r3_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_SELECT, joypad_select, &joypad_select_press);
+    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_START, joypad_start, &joypad_start_press);
+}
+
 #endif
 
 void retro_run(void)
@@ -570,23 +591,8 @@ void retro_run(void)
     }
 
     #else
-    
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_UP, joypad_up, &joypad_up_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_DOWN, joypad_down, &joypad_down_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_LEFT, joypad_left, &joypad_left_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_RIGHT, joypad_right, &joypad_right_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_A, joypad_a, &joypad_a_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_B, joypad_b, &joypad_b_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_X, joypad_x, &joypad_x_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_Y, joypad_y, &joypad_y_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_L, joypad_l, &joypad_l_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_R, joypad_r, &joypad_r_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_L2, joypad_l2, &joypad_l2_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_R2, joypad_r2, &joypad_r2_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_L3, joypad_l3, &joypad_l3_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_R3, joypad_r3, &joypad_r3_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_SELECT, joypad_select, &joypad_select_press);
-    check_joypad_variable(RETRO_DEVICE_ID_JOYPAD_START, joypad_start, &joypad_start_press);
+        
+    check_joypad();
 
     #endif
 
